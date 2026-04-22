@@ -25,7 +25,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
-            # 1. Node.js környezet beállítása
+            # 1. Node.js környezet beállítása (igazából mégsem ezt használom)
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
