@@ -17,7 +17,7 @@ I use it to improve my skills in HTML, CSS, and JavaScript while building fun an
 If you're interested in how to get started with web development, check out my blog.
 
 Currently available only in Hungarian:
-👉 https://nagraggini-blog.onrender.com/
+👉 https://nagraggini.github.io/my-awesome-book/
 
 ---
 
@@ -37,7 +37,7 @@ Célja, hogy fejlesszem a HTML, CSS és JavaScript tudásomat, miközben egyszer
 
 Ha érdekel, hogyan kezdj el webfejlesztést tanulni, nézd meg a blogomat:
 
-👉 https://nagraggini-blog.onrender.com/
+👉 https://nagraggini.github.io/my-awesome-book/
 
 # Előkészületek Vite-hoz
 
@@ -53,7 +53,7 @@ Terminálban navigálj el (cd-vel) oda ahova szeretnéd a projekt mappáját.
 npm create vite@latest
 Írd be a projekt nevét. pl.: my-app
 Framework: vanilla aztán javascript
-Kiírja a local host-ot. http://localhost:5173/
+Kiírja a local host-ot. pl.: http://localhost:5173/
 cd my-app
 npm install
 
