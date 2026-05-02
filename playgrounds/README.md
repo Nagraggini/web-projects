@@ -1,1 +1,0 @@
-A többi projektemet [itt](https://codepen.io/Nagraggini) találod.

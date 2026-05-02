@@ -39,28 +39,363 @@ Ha érdekel, hogyan kezdj el webfejlesztést tanulni, nézd meg a blogomat:
 
 👉 https://nagraggini.github.io/my-awesome-book/
 
-# Előkészületek Vite-hoz
+# Előkészületek
 
-A dinamikus tartalom és a gyors frissítés miatt jobb, ha a js-ben van a html lényegi része.
+Gyors gombok:
+A terminálból másolni ctrl+shift+c és beilleszteni a ctrl+shift+v .
+
+Terminálban navigálj el (cd-vel) oda ahova szeretnéd a projekt mappáját, vagy egyből nyisd meg a projekt mappáját a vs code-ban.
+
+Verzió kezeléshez:
+Terminálban: git init
+
+## Előkészületek Vite-hoz
+
+ A dinamikus tartalom és a gyors frissítés miatt jobb, ha a js-ben van a html lényegi része.
 
 Telepítés:
 Terminálba írd be:
-node -v
+node -v //Ha v20 vagy v22-t látsz, akkor a következő részt hagyd ki.
 npm -v
 
-Terminálban navigálj el (cd-vel) oda ahova szeretnéd a projekt mappáját.
+Régi node esetén:
+sudo apt update && sudo apt install curl
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc //Terminál frissítése.
+nvm install --lts
 
-npm create vite@latest
-Írd be a projekt nevét. pl.: my-app
-Framework: vanilla aztán javascript
+Windows verzió:
+winget install CoreyButler.NVMforWindows
+Indítsd újra a terminált.
+nvm install lts
+nvm use lts
+
+npm telepítése linuxra:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+Utána:
+nvm install --lts
+
+Windows verzió:
+nvm install lts    # Telepíti a legfrissebb stabil verziót
+nvm use lts        # Aktiválja azt
+
+npm create vite@latest .
+y -> Ignore files and continue
+Framework: vanilla aztán javascript -> Install with npm: Yes
 Kiírja a local host-ot. pl.: http://localhost:5173/
-cd my-app
-npm install
 
-Projekt elindítása: npm run dev
+Localhost elindítása: npm run dev
 
-Projekt leállítása: Terminálban ctrl+c-t nyomj.
+Localhost leállítása: Terminálban ctrl+c-t nyomj.
 
+## Mappa szerkezet lértehozása
+
+```bash
+my-web-app/
+├── dist/
+├── src/
+│   ├── assets/
+│   │   ├── images/
+│   │   ├── icons/
+│   │   ├── fonts/
+│   │   └── vendor/
+│   ├── css/
+│   │   ├── base/
+│   │   ├── components/
+│   │   ├── layouts/
+│   │   └── main.css
+│   ├── js/
+│   │   ├── components/
+│   │   ├── services/
+│   │   ├── utils/
+│   │   ├── config/
+│   │   └── main.js
+│   └── index.html
+├── .github/
+├── tests/
+├── .gitignore
+├──  index.html
+├── package.json
+└── README.md
+```
+
+A fenti mappa szerkezetet, így tudod profin létre hozni:
+Terminal -> New Terminal
+
+mkdir -p src/assets/{images,icons,fonts,vendor} src/css/{base,components,layouts} src/js/{components,services,utils,config} .github tests && touch src/css/main.css src/js/main.js README.md .gitignore && rm src/counter.js src/main.js src/style.css && rm src/assets/javascript.svg src/assets/vite.svg&& find src -type d -empty -not -path '*/.*' -exec touch {}/.gitkeep \;
+
+index.html fájlba ezt írd be:
+```html
+<!doctype html>
+<html lang="hu">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link rel="stylesheet" href="/src/css/main.css" />
+
+        <title>Weboldalam</title>
+    </head>
+    <body>
+        <div id="app"></div>
+
+        <script type="module" src="/src/js/main.js"></script>
+    </body>
+</html>
+
+```
+
+## Feltöltés GitHub-ra
+
+GitHub Desktop -> File -> Add local repo
+-> Keresd meg a projekt mappáját. -> Add repo.
+
+Add hozzá az első commit-od bal oldalt. 
+Után publikáljuk a repot: jobb oldal Publish repo -> Publish repo
+
+## Linting automatizása
+
+A linter azt vizsgálja, hogy a kód szép, szabványos és hibamentes-e.
+
+package.json fájlba módosítása:
+  Ez volt a régi:
+
+```json
+   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"  
+  },
+```
+
+```json
+ "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint ."
+  },
+```
+Telepítése:
+Futtatás terminálban: npm run lint
+
+# GitHub Actions
+
+<!--TODO -->
+1. Minőségellenőrzés (CI - Continuous Integration || Continuous Integration) -> pl.: Playwright
+2. Automatikus Közzététel (CD - Continuous Deployment || Deployment) -> pl.: GitHub Pages, Vercel
+3. Karbantartás és Biztonság (Automation)-> 
+    Dependabot: Automatikusan figyeli a package.json-t, és ha valamelyik npm csomagnak (pl. Vite) kijön egy biztonsági frissítése, nyit neked egy Pull Requestet vele.
+
+    Lighthouse CI: Minden commit után lefut egy audit, és megmondja, mennyire lett gyorsabb vagy lassabb az oldalad (SEO, Performance, Accessibility).
+
+## Ha nem lehet publikus a forráskód
+
+Privát kód esetén ez kell: Netlify, vagy Vercel, vagy Firebase Hosting kell.
+
+### Vercel beállítása
+
+https://vercel.com/-ra regisztrálj.
+
+Jobb oldalt Add New ...-> Projects -> Választ ki a privát repo-t a listából Import gombbal.
+
+Application Preset: Vite //Ha nem jól mutatná. -> Deploy -> Várj kicsit. -> Continue to Dashboard
+
+A Domains részen láthatod a weboldalad linkjét. Jelen esetben: https://webfejlesztes-modulzaro-260117-f-an.vercel.app/
+
+### vite.config.js vercel esetén.
+
+Terminálba ezt másold be:
+
+echo "import { defineConfig } from 'vite'
+
+export default defineConfig({
+  // A relatív útvonal a vercelhez.
+    base: "./",
+})" > vite.config.js
+
+Ezután commitolj és mehet a push and pull a GitHub Desktop alkalmazásban.
+
+### Github Actions-ben Playwright beállítása
+
+Terminálba ezt írd be: npm init playwright@latest -> Typescript -> tests -> y -> y -> y 
+
+Miután végzett írd felül ezt a fájlt:
+.github/workflows/playwright.yml
+
+```yaml
+name: Playwright Tests
+on:
+    deployment_status: # Akkor fut le, amikor a Vercel végzett a buildeléssel.
+jobs:
+    test:
+        # Csak akkor fusson, ha a Vercel sikeresen létrehozta a Preview URL-t.
+        if: github.event.deployment_status.state == 'success'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: "npm"
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps
+
+            - name: Run Playwright tests
+              run: npx playwright test
+              env:
+                  # A Vercel által generált dinamikus URL használata
+                  BASE_URL: ${{ github.event.deployment_status.target_url }}
+                  # Ha vannak titkos környezeti változóid (pl. teszt felhasználó)
+                  #MY_SECRET_API_KEY: ${{ secrets.MY_SECRET_API_KEY }}
+
+            - uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: playwright-report
+                  path: playwright-report/
+                  retention-days: 30
+```
+
+A playwright.config.ts fájlban:
+
+Ezt módosítsd:
+```ts
+ use: {
+    /* Base URL to use in actions like `await page.goto('')`. */
+    // baseURL: 'http://localhost:3000',
+
+    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    trace: 'on-first-retry',
+  },
+```
+Erre:
+
+```ts
+/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  use: {
+    /* Base URL to use in actions like `await page.goto('/')`. */
+    /*A localhost száma lehet más, csekkold le, írd be a terminálba: npm run dev*/
+    baseURL: process.env.BASE_URL || 'http://localhost:5173',
+
+    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    trace: 'on-first-retry',
+  },
+```
+
+
+Utána csekkold le magad:
+Terminálba írd be: npm run dev
+npx playwright test
+
+#### Playwright badge beállítása
+
+Böngészőben nyid meg a repod -> Actions -> bal oldalt Playwright Tests -> Jobb felül három pöttyre katt -> Create status badge -> Majd copy-ra és illeszd be a README.md fájlod elejére. 
+
+## Ha publikus lehet a forráskód
+
+Nyisd meg a böngészőben a github-os repodat. -> Settings -> Lentebb görgess a legvégére. -> Change visibility -> Change to public
+
+Aztán felül bal oldalt Pages.
+
+Itt a "Build and deployment" résznél a forrás (Source) maradjon Deploy from a branch, a Branch-nél pedig válaszd ki a main ágat és kattints a Save gombra.
+
+Ekkor a GitHub elindít egy folyamatot (ezt látod az Actions fülön), és 1-2 percen belül kapsz egy linket, ami így néz ki: https://felhasznalonev.github.io/repo-neve/.
+
+### GitHub Pages beállítása (Vite + GitHub Actions)
+
+#### Első módszer
+
+Nyisd meg a böngészőben a github-os repodat. -> Settings -> Actions -> General -> Read and write permissions -t pipáld be.
+
+A GitHub Actions szempontjából a Vite projekt csak egy sima Node.js projekt, ezért meg kell kérni, hogy futtassa le az npm run build-et.
+
+Nyisd meg a böngészőben a github-os repodat. -> Actions -> set up a workflow yourself 
+nevezd át felül deploy.yml-re. Látod mellette a master/main nevet az a branch neve.
+
+#### Második módszer
+
+Terminálba: mkdir .github/workflows&&touch .github/workflows/deploy.yml
+
+##### Első, vagy második módszer után ez jön
+
+Ezt másold bele: 
+```yml
+name: Deploy to GitHub Pages
+
+on:
+    push:
+        branches: [main] # A fenti branch névvel egyeznie kell!
+
+permissions: # Engedélyek: olvasás, írás meg a token írás, ha van.
+    contents: read
+    pages: write
+    id-token: write
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4 # Marketplace-ről: Letölti a kódot.
+
+            - name: Set up Node
+              uses: actions/setup-node@v4 # Marketplace-ről: Beállítja a Node.js-t.
+              with:
+                  node-version: 22 # Verziót csekkold le. LTS-t használj.
+                  cache: "npm"
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Build
+              run: npm run build # Ez hozza létre a 'dist' mappát.
+
+            - name: Setup Pages
+              uses: actions/configure-pages@v4 # Beállítja a környezetet.
+
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3 # Feltölti az újonnan létrehozott 'dist' mappát.
+              with:
+                  path: "./dist"
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4 # Publikálja az oldalt.
+
+```
+Jobb szélen a Documentation alatt láthatod a fentiek magyarázatát. A tabulátorokra és szóközökre érzékeny a yml fájlt.
+
+Első módszer esetén: Kattints a Commit changes-re. -> Commit changes
+
+Másodiknál, csak commitolj egyet.
+
+### vite.config.js GitHub Pages esetén (publikus a forráskód)
+
+Terminálba egybe ezt másold be:
+
+echo "import { defineConfig } from 'vite'
+
+export default defineConfig({
+  // A 'repo-neve' helyére írd be a GitHub repód pontos nevét per jelek közé!
+  base: '/webprojects/',
+})" > vite.config.js
+
+Ezután commitolj és mehet a push and pull a GitHub Desktop alkalmazásban.
+
+**Későbbi teszteknél ezt használd:**
+Élesítés: Terminálba: git push -> A GitHub YAML fájlja átveszi a stafétát, és 1-2 perc múlva kint van az oldalon.
+
+---------------------------------------------------------------------------------------------------------------
+
+
+
+---------------------
 # Teszt Playwright-al
 
 Terminálba: npm init playwright@latest
@@ -203,16 +538,12 @@ npx playwright test --headed
 npx playwright test --ui
 npx playwright test --debug
 
-# Codesand.io használata
+# Github branch
 
-https://codesandbox.io/
+A Settingben állj át az új branchre és a Pages-en is.
 
-Lépj be a github fiókoddal.
-
-Jobb felül "Create" -> Html+css, ne aggódj js-t is tudsz majd létrehozni.
-
-Template-k:
-https://codesandbox.io/search?query=spring%20boot&type=template&refinementList%5Btemplate%5D=&page=1&configure%5BhitsPerPage%5D=12
+Pages -> build and deployment -> source -> GitHub Actions -> Static HTML
+A branch névre figyelj, hogy megfelelő legyen beállítva.
 
 # Források
 
@@ -224,12 +555,7 @@ https://www.freecodecamp.org/learn/javascript-v9/lecture-working-with-the-dom-cl
 [How to create a Responsive Navigation Bar (for beginners)](https://www.youtube.com/watch?v=U8smiWQ8Seg)
 
 
-# Github branch
 
-A Settingben állj át az új branchre és a Pages-en is.
-
-Pages -> build and deployment -> source -> GitHub Actions -> Static HTML
-A branch névre figyelj, hogy megfelelő legyen beállítva.
 
 # Mappa Struktúra
 
@@ -280,3 +606,43 @@ web-practising-and-fun/
 │
 └── node_modules/               # Telepített könyvtárak (Playwright, Servor)
 
+
+---------------------------------------------------------------------------------------------------------------
+
+# Lefedettség ellenőrzése
+
+Terminálba ezt írd be: npm run dev 
+
+A megjelent linkre katt.
+
+Nyomj egy F12-őt (Fejlesztői eszközök) pl: Chrome-ban.
+
+Nyomj egy Ctrl + Shift + P kombinációt (ez a parancskereső).
+
+Írd be, hogy: Coverage, majd válaszd a Show Coverage lehetőséget.
+
+Katt a Reload page gombra.
+
+A böngésző újratölti az oldalt, és elemzi a fájlokat.
+
+Látni fogsz egy listát a fájljaidról. A Unused Bytes oszlop mutatja meg, mennyi kód nem lett felhasználva, egy piros/kék csík pedig vizuálisan is jelzi az arányt. Kattints a style.css ás fájlodra és meg fog jelenni bal oldalt. Zöld csík lesz amellett, amit használtál, szürke meg amit nem. 
+
+# Local teszthez
+
+Fejlesztés:                 
+    Terminálba ezt írd be: npm run dev -> Katt a terminálban lévő linkre. -> Kódolsz, látsz minden változást élőben.       
+
+    Leállításhoz a terminálba kattintsd beel és ctrl+c      
+
+Ellenőrzés (opcionális):            
+    npm run lint -> Megnézed, "szép-e" a kódod és nincs-e benne hiba.       
+
+    npm run build -> Megnézed, minden rendben van-e a végleges fájlokkal. Legenerálod a dist mappát és a benne lévő index.html fájlt csekkold.      
+
+Commitoláshoz:      
+    Kijelölés: git add .            
+    Mentés: git commit -m "Upload README.md"            
+    Feltöltés: git push     
+
+Csekkolás:      
+    git status 
