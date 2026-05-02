@@ -31,7 +31,7 @@ Célja, hogy fejlesszem a HTML, CSS és JavaScript tudásomat, miközben egyszer
 
 ## Élő verzió
 
-👉 https://nagraggini.github.io/web-practising-and-fun/
+👉 https://nagraggini.github.io/web-projects/
 
 ## IT Blog
 
