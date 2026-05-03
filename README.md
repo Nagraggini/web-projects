@@ -39,6 +39,41 @@ Ha érdekel, hogyan kezdj el webfejlesztést tanulni, nézd meg a blogomat:
 
 👉 https://nagraggini.github.io/my-awesome-book/
 
+Tartalomjegyzék
+
+- [Források](#források)
+- [Előkészületek](#előkészületek)
+  - [Előkészületek Vite-hoz](#előkészületek-vite-hoz)
+  - [Mappa szerkezet lértehozása](#mappa-szerkezet-lértehozása)
+  - [Feltöltés GitHub-ra](#feltöltés-github-ra)
+  - [Linting automatizása](#linting-automatizása)
+- [GitHub Actions](#github-actions)
+  - [Ha nem lehet publikus a forráskód](#ha-nem-lehet-publikus-a-forráskód)
+    - [Vercel beállítása](#vercel-beállítása)
+    - [vite.config.js vercel esetén.](#viteconfigjs-vercel-esetén)
+    - [Github Actions-ben Playwright beállítása](#github-actions-ben-playwright-beállítása)
+      - [Playwright badge beállítása](#playwright-badge-beállítása)
+  - [Ha publikus lehet a forráskód](#ha-publikus-lehet-a-forráskód)
+    - [GitHub Pages beállítása (Vite + GitHub Actions)](#github-pages-beállítása-vite--github-actions)
+      - [Első módszer](#első-módszer)
+      - [Második módszer](#második-módszer)
+        - [Első, vagy második módszer után ez jön](#első-vagy-második-módszer-után-ez-jön)
+    - [vite.config.js GitHub Pages esetén (publikus a forráskód)](#viteconfigjs-github-pages-esetén-publikus-a-forráskód)
+- [Playwright beállítása](#playwright-beállítása)
+- [Playwright használata](#playwright-használata)
+- [Lefedettség ellenőrzése](#lefedettség-ellenőrzése)
+- [Multi pages beállítása](#multi-pages-beállítása)
+- [Local teszthez](#local-teszthez)
+
+# Források
+
+https://www.youtube.com/watch?v=i_KXcwr7PYc
+https://www.freecodecamp.org/learn/javascript-v9/lecture-working-with-the-dom-click-events-and-web-apis/what-is-an-api-and-what-are-web-apis
+https://www.youtube.com/watch?v=HmaQwuKUYTc
+https://www.freecodecamp.org/learn/javascript-v9/lecture-working-with-the-dom-click-events-and-web-apis/how-do-you-create-new-nodes-using-innerhtml-and-createelement
+[10 CSS PRO Tips and Tricks you NEED to know](https://www.youtube.com/watch?v=44FTAS-qT8Q&list=WL&index=11)
+[How to create a Responsive Navigation Bar (for beginners)](https://www.youtube.com/watch?v=U8smiWQ8Seg)
+
 # Előkészületek
 
 Gyors gombok:
@@ -352,13 +387,13 @@ jobs:
                   cache: "npm"
 
             - name: Install dependencies
-              run: npm install
+              run: npm ci # Continuous Integration
 
             - name: Build
               run: npm run build # Ez hozza létre a 'dist' mappát.
 
             - name: Setup Pages
-              uses: actions/configure-pages@v4 # Beállítja a környezetet.
+              uses: actions/configure-pages@v5 # Beállítja a környezetet. Ebből használd az újabbat.
 
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v3 # Feltölti az újonnan létrehozott 'dist' mappát.
@@ -514,15 +549,6 @@ npx playwright test --headed
 npx playwright test --ui
 npx playwright test --debug
 
-# Források
-
-https://www.youtube.com/watch?v=i_KXcwr7PYc
-https://www.freecodecamp.org/learn/javascript-v9/lecture-working-with-the-dom-click-events-and-web-apis/what-is-an-api-and-what-are-web-apis
-https://www.youtube.com/watch?v=HmaQwuKUYTc
-https://www.freecodecamp.org/learn/javascript-v9/lecture-working-with-the-dom-click-events-and-web-apis/how-do-you-create-new-nodes-using-innerhtml-and-createelement
-[10 CSS PRO Tips and Tricks you NEED to know](https://www.youtube.com/watch?v=44FTAS-qT8Q&list=WL&index=11)
-[How to create a Responsive Navigation Bar (for beginners)](https://www.youtube.com/watch?v=U8smiWQ8Seg)
-
 # Lefedettség ellenőrzése
 
 Terminálba ezt írd be: npm run dev 
@@ -540,6 +566,62 @@ Katt a Reload page gombra.
 A böngésző újratölti az oldalt, és elemzi a fájlokat.
 
 Látni fogsz egy listát a fájljaidról. A Unused Bytes oszlop mutatja meg, mennyi kód nem lett felhasználva, egy piros/kék csík pedig vizuálisan is jelzi az arányt. Kattints a style.css ás fájlodra és meg fog jelenni bal oldalt. Zöld csík lesz amellett, amit használtál, szürke meg amit nem. 
+
+# Multi pages beállítása
+
+vite.config.js-t írd át erre:
+
+```js
+import { defineConfig } from "vite";
+
+const appName = process.env.APP_NAME || '';
+
+export default defineConfig({
+  // Dinamikus bázis útvonal a GitHub Pages-hez
+  base: appName ? `/web-projects/apps/${appName}/` : '/',
+
+  // Itt javítjuk a változókat:
+  root: appName ? `apps/${appName}` : '.',
+  
+  build: {
+    // Itt is a process.env-ből származó appName-et használjuk
+    outDir: appName ? `../../dist/apps/${appName}` : './dist',
+    emptyOutDir: false,
+  },
+});
+```
+Ha nem apps mappában vannak a projektjeid, akkor írd át a konfigban. 
+
+.github/workflows/deploy.yml fájlban töröld ezt:
+```yml
+            - name: Build
+              run: npm run build # Ez hozza létre a 'dist' mappát.
+```
+
+Ezt írd be helyette:
+```yml
+            - name: Build all apps
+              run: |
+                # 1. Létrehozzuk a dist mappát és az apps almappát benne
+                mkdir -p dist/apps
+
+                # 2. Átmásoljuk a főoldalt és annak esetleges függőségeit a gyökérből
+                cp index.html dist/
+                # Ha vannak egyéb fájlok a gyökérben (pl. style.css, képek), azokat is:
+                # cp -r assets dist/ 2>/dev/null || echo "Nincs assets mappa"
+
+                # 3. Buildeljük az al-alkalmazásokat az apps mappába
+                for dir in apps/*; do
+                  if [ -d "$dir" ]; then
+                    app=$(basename "$dir")
+                    echo "Building $app..."
+                    # Belépünk, buildelünk a dist/apps/app-neve mappába, majd visszalépünk
+                    cd $dir && APP_NAME=$app npm run build -- --outDir ../../dist/apps/$app
+                    cd ../..
+                  fi
+                done
+```
+Ha más lenne a mappád neve, akkor a deployban is írd át. Szóközökre és tabulátorolra figyelj.
 
 # Local teszthez
 

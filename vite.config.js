@@ -1,7 +1,17 @@
 import { defineConfig } from "vite";
 
+const appName = process.env.APP_NAME || "";
+
 export default defineConfig({
-    // A '/repo-neve/' helyére írd be a GitHub repód pontos nevét per jelek közé!
-    base: "/web-projects/",
-    //A Vite ilyenkor a helyi szerveren is ezen az útvonalon szolgálja ki a fájlokat, hogy szimulálja a GitHub Pages környezetét.
+    // Dinamikus bázis útvonal a GitHub Pages-hez
+    base: appName ? `/web-projects/apps/${appName}/` : "/",
+
+    // Itt javítjuk a változókat:
+    root: appName ? `apps/${appName}` : ".",
+
+    build: {
+        // Itt is a process.env-ből származó appName-et használjuk
+        outDir: appName ? `../../dist/apps/${appName}` : "./dist",
+        emptyOutDir: false,
+    },
 });

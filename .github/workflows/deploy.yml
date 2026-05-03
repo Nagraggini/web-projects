@@ -9,6 +9,10 @@ permissions: # Engedélyek: olvasás, írás meg a token írás, ha van.
     pages: write
     id-token: write
 
+concurrency: # Erőforrás optimalizálása és a felesleges várakozás elkerülése.
+    group: pages
+    cancel-in-progress: true
+
 jobs:
     build-and-deploy:
         runs-on: ubuntu-latest
@@ -23,18 +27,37 @@ jobs:
                   cache: "npm"
 
             - name: Install dependencies
-              run: npm install
+              run: npm ci # Continuous Integration
 
-            - name: Build
-              run: npm run build # Ez hozza létre a 'dist' mappát.
+            - name: Build all apps
+              run: |
+                  # 1. Létrehozzuk a dist mappát és az apps almappát benne
+                  mkdir -p dist/apps
+
+                  # 2. Átmásoljuk a főoldalt és annak esetleges függőségeit a gyökérből
+                  cp index.html dist/
+                  # Ha vannak egyéb fájlok a gyökérben (pl. style.css, képek), azokat is:
+                  # cp -r assets dist/ 2>/dev/null || echo "Nincs assets mappa"
+
+                  # 3. Buildeljük az al-alkalmazásokat az apps mappába
+                  for dir in apps/*; do
+                    if [ -d "$dir" ]; then
+                      app=$(basename "$dir")
+                      echo "Building $app..."
+                      # Belépünk, buildelünk a dist/apps/app-neve mappába, majd visszalépünk
+                      cd $dir && APP_NAME=$app npm run build -- --outDir ../../dist/apps/$app
+                      cd ../..
+                    fi
+                  done
 
             - name: Setup Pages
-              uses: actions/configure-pages@v4 # Beállítja a környezetet.
+              uses: actions/configure-pages@v5 # Beállítja a környezetet. v5 a verzió száma. Mindig használd az újabbat ebből legalábbis.
 
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v3 # Feltölti az újonnan létrehozott 'dist' mappát.
               with:
                   path: "./dist"
+
             - name: Deploy to GitHub Pages
               id: deployment
               uses: actions/deploy-pages@v4 # Publikálja az oldalt.
