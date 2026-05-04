@@ -552,6 +552,8 @@ npx playwright test --debug
 
 # main branch védése
 
+Ezt akkor állítsd be, ha többen dolgoztok a repo és kell egy vezető.
+
 Github repodat nyisd meg a böngészőben. -> Settings -> Rules -> Rulesets -> New branch ruleset -> 
 NRuleset Name: Main Protection
 Enforcement status: Active
@@ -592,23 +594,8 @@ Látni fogsz egy listát a fájljaidról. A Unused Bytes oszlop mutatja meg, men
 vite.config.js-t írd át erre:
 
 ```js
-import { defineConfig } from "vite";
 
-const appName = process.env.APP_NAME || '';
 
-export default defineConfig({
-  // Dinamikus bázis útvonal a GitHub Pages-hez
-  base: appName ? `/web-projects/apps/${appName}/` : '/',
-
-  // Itt javítjuk a változókat:
-  root: appName ? `apps/${appName}` : '.',
-  
-  build: {
-    // Itt is a process.env-ből származó appName-et használjuk
-    outDir: appName ? `../../dist/apps/${appName}` : './dist',
-    emptyOutDir: false,
-  },
-});
 ```
 Ha nem apps mappában vannak a projektjeid, akkor írd át a konfigban. 
 

@@ -1,17 +1,40 @@
 import { defineConfig } from "vite";
+import { resolve } from "path";
 
-const appName = process.env.APP_NAME || "";
+// Konkrét mappáim listája - ez a "Whitelist"
+const VALID_APPS = [
+    "for-a-new-job",
+    "guest-number",
+    "job-interview-q-and-a",
+    "questlog",
+    "rock-band",
+];
+
+const requestedApp = process.env.APP_NAME || "";
+const isSubApp = VALID_APPS.includes(requestedApp);
+const appName = isSubApp ? requestedApp : "";
 
 export default defineConfig({
-    // Dinamikus bázis útvonal a GitHub Pages-hez
-    base: appName ? `/web-projects/apps/${appName}/` : "/",
+    // Ha al-appot buildelünk, az apps/mappa az alap, különben a gyökér
+    root: isSubApp ? resolve(__dirname, "apps", appName) : resolve(__dirname),
 
-    // Itt javítjuk a változókat:
-    root: appName ? `apps/${appName}` : ".",
+    base: isSubApp ? `/web-projects/apps/${appName}/` : "/web-projects/",
 
     build: {
-        // Itt is a process.env-ből származó appName-et használjuk
-        outDir: appName ? `../../dist/apps/${appName}` : "./dist",
-        emptyOutDir: false,
+        // A kimeneti mappa is igazodik: dist/apps/név VAGY simán a dist/ gyökér
+        outDir: isSubApp
+            ? resolve(__dirname, "dist", "apps", appName)
+            : resolve(__dirname, "dist"),
+
+        emptyOutDir: isSubApp ? false : true, // A fő buildnél takarítunk, al-appnál nem töröljük a többit
+
+        rollupOptions: {
+            input: {
+                // Dinamikusan meghatározzuk a belépési pontot
+                main: isSubApp
+                    ? resolve(__dirname, "apps", appName, "index.html")
+                    : resolve(__dirname, "index.html"),
+            },
+        },
     },
 });
