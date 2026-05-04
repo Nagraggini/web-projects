@@ -31,20 +31,12 @@ jobs:
 
             - name: Build all apps
               run: |
-                  # 1. Létrehozzuk a dist mappát és az apps almappát benne
-                  mkdir -p dist/apps
-
-                  # 2. Átmásoljuk a főoldalt és annak esetleges függőségeit a gyökérből
+                  mkdir -p dist/apps   
                   cp index.html dist/
-                  # Ha vannak egyéb fájlok a gyökérben (pl. style.css, képek), azokat is:
-                  # cp -r assets dist/ 2>/dev/null || echo "Nincs assets mappa"
-
-                  # 3. Buildeljük az al-alkalmazásokat az apps mappába
                   for dir in apps/*; do
                     if [ -d "$dir" ]; then
                       app=$(basename "$dir")
-                      echo "Building $app..."
-                      # Belépünk, buildelünk a dist/apps/app-neve mappába, majd visszalépünk
+                      echo "Building $app..."                    
                       cd $dir && APP_NAME=$app npm run build -- --outDir ../../dist/apps/$app
                       cd ../..
                     fi
