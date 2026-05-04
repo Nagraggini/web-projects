@@ -1,3 +1,9 @@
+// Használd a pontos elérési utat a JS fájlhoz képest
+import "../css/main.css";
+
+document.querySelector(".menu-button").addEventListener("click", showSidebar);
+document.querySelector(".close-sidebar").addEventListener("click", hideSidebar);
+
 //Mobilos navigációs bár mutatása és elrejtése.
 function showSidebar() {
     const sidebar = document.querySelector(".sidebar");

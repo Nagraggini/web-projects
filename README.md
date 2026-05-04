@@ -594,7 +594,46 @@ Látni fogsz egy listát a fájljaidról. A Unused Bytes oszlop mutatja meg, men
 vite.config.js-t írd át erre:
 
 ```js
+import { defineConfig } from "vite";
+import { resolve } from "path";
 
+// Konkrét mappáim listája - ez a "Whitelist"
+const VALID_APPS = [
+    "for-a-new-job",
+    "guest-number",
+    "job-interview-q-and-a",
+    "questlog",
+    "rock-band",
+];
+
+const requestedApp = process.env.APP_NAME || "";
+const isSubApp = VALID_APPS.includes(requestedApp);
+const appName = isSubApp ? requestedApp : "";
+
+export default defineConfig({
+    // Ha al-appot buildelünk, az apps/mappa az alap, különben a gyökér
+    root: isSubApp ? resolve(__dirname, "apps", appName) : resolve(__dirname),
+
+    base: isSubApp ? `/web-projects/apps/${appName}/` : "/web-projects/",
+
+    build: {
+        // A kimeneti mappa is igazodik: dist/apps/név VAGY simán a dist/ gyökér
+        outDir: isSubApp
+            ? resolve(__dirname, "dist", "apps", appName)
+            : resolve(__dirname, "dist"),
+
+        emptyOutDir: isSubApp ? false : true, // A fő buildnél takarítunk, al-appnál nem töröljük a többit
+
+        rollupOptions: {
+            input: {
+                // Dinamikusan meghatározzuk a belépési pontot
+                main: isSubApp
+                    ? resolve(__dirname, "apps", appName, "index.html")
+                    : resolve(__dirname, "index.html"),
+            },
+        },
+    },
+});
 
 ```
 Ha nem apps mappában vannak a projektjeid, akkor írd át a konfigban. 
@@ -608,21 +647,13 @@ Ha nem apps mappában vannak a projektjeid, akkor írd át a konfigban.
 Ezt írd be helyette:
 ```yml
             - name: Build all apps
-              run: |
-                # 1. Létrehozzuk a dist mappát és az apps almappát benne
+              run: |         
                 mkdir -p dist/apps
-
-                # 2. Átmásoljuk a főoldalt és annak esetleges függőségeit a gyökérből
                 cp index.html dist/
-                # Ha vannak egyéb fájlok a gyökérben (pl. style.css, képek), azokat is:
-                # cp -r assets dist/ 2>/dev/null || echo "Nincs assets mappa"
-
-                # 3. Buildeljük az al-alkalmazásokat az apps mappába
                 for dir in apps/*; do
                   if [ -d "$dir" ]; then
                     app=$(basename "$dir")
                     echo "Building $app..."
-                    # Belépünk, buildelünk a dist/apps/app-neve mappába, majd visszalépünk
                     cd $dir && APP_NAME=$app npm run build -- --outDir ../../dist/apps/$app
                     cd ../..
                   fi
