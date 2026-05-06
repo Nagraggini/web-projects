@@ -614,7 +614,7 @@ A Settings-en belül a Environments részen a github-pages-t is töröld ki.
 
 ".github/workflows/deploy.yml" fájlod, így nézzen ki:
 ```yml
-name: Tuti Pipeline (Build + Test + Deploy)
+name: Full Pipeline (Build + Test + Deploy)
 
 on:
     push:
@@ -665,16 +665,17 @@ jobs:
                   retention-days: 30
 
             # 7. DEPLOY A VERCEL-RE
-            # Ez a lépés CSAK akkor fut le, ha az összes fenti lépés SIKERES volt.
             - name: Deploy to Vercel
-              if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-              uses: amondnet/vercel-action@v25
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+              uses: amondnet/vercel-action@v25.2.0 # Frissebb alverzió.
               with:
-                  vercel-token: ${{ secrets.VERCEL_TOKEN }}
+                  vercel-token: ${{ secrets.VERCEL_TOKEN }} # Ellenőrizd, hogy be van-e állítva a GitHub-on!
                   vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
                   vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-                  vercel-args: "--prod" # Élesítés!
+                  vercel-args: "--prod"
+                  working-directory: ./ # Ha a kódod egy almappában van, írd át (pl. ./my-app)
 ```
+A 7-es pontot töröld ki egyenlőre, így ha elhasal a teszt akkor kint lesz production ready-ben az oldal.
 
 Ha a workflows-ban van playwright.yml fájlod akkor azt törölni ki, mert a fenti yml-ben már az is benne van.
 

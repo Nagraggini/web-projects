@@ -47,14 +47,3 @@ jobs:
                   name: playwright-report
                   path: playwright-report/
                   retention-days: 30
-
-            # 7. DEPLOY A VERCEL-RE
-            - name: Deploy to Vercel
-              if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-              uses: amondnet/vercel-action@v25.2.0 # Frissebb alverzió.
-              with:
-                  vercel-token: ${{ secrets.VERCEL_TOKEN }} # Ellenőrizd, hogy be van-e állítva a GitHub-on!
-                  vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-                  vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-                  vercel-args: "--prod"
-                  working-directory: ./ # Ha a kódod egy almappában van, írd át (pl. ./my-app)
